@@ -90,12 +90,22 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition = new Definition('%old_sound_rabbit_mq.producer.class%');
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
-                $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
+
+                //this producer doesn't define a exchange
+                if (isset($producer['exchange_options'])) {
+                    $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
+                }
+
                 //this producer doesn't define a queue
                 if (!isset($producer['queue_options'])) {
                     $producer['queue_options']['name'] = null;
                 }
                 $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
+
+                if (isset($producer['default_routing_key'])) {
+                    $definition->addMethodCall('setDefaultRoutingKey', array($producer['default_routing_key']));
+                }
+
                 $this->injectConnection($definition, $producer['connection']);
                 if ($this->collectorEnabled) {
                     $this->injectLoggedChannel($definition, $key, $producer['connection']);

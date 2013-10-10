@@ -125,18 +125,20 @@ abstract class BaseAmqp
 
     protected function exchangeDeclare()
     {
-        $this->getChannel()->exchange_declare(
-            $this->exchangeOptions['name'],
-            $this->exchangeOptions['type'],
-            $this->exchangeOptions['passive'],
-            $this->exchangeOptions['durable'],
-            $this->exchangeOptions['auto_delete'],
-            $this->exchangeOptions['internal'],
-            $this->exchangeOptions['nowait'],
-            $this->exchangeOptions['arguments'],
-            $this->exchangeOptions['ticket']);
+        if (!empty($this->exchangeOptions['name'])) {
+            $this->getChannel()->exchange_declare(
+                $this->exchangeOptions['name'],
+                $this->exchangeOptions['type'],
+                $this->exchangeOptions['passive'],
+                $this->exchangeOptions['durable'],
+                $this->exchangeOptions['auto_delete'],
+                $this->exchangeOptions['internal'],
+                $this->exchangeOptions['nowait'],
+                $this->exchangeOptions['arguments'],
+                $this->exchangeOptions['ticket']);
 
-        $this->exchangeDeclared = true;
+            $this->exchangeDeclared = true;
+        }
     }
 
     protected function queueDeclare()

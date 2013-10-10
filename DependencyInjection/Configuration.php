@@ -45,6 +45,7 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getQueueConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
+                            ->scalarNode('default_routing_key')->end()
                         ->end()
                     ->end()
                 ->end()
