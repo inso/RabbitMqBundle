@@ -9,7 +9,6 @@ class Producer extends BaseAmqp
 {
     protected $contentType = 'text/plain';
     protected $deliveryMode = 2;
-    protected $defaultRoutingKey = '';
 
     public function setContentType($contentType)
     {
@@ -25,13 +24,6 @@ class Producer extends BaseAmqp
         return $this;
     }
 
-    public function setDefaultRoutingKey($routingKey)
-    {
-        $this->defaultRoutingKey = $routingKey;
-
-        return $this;
-    }
-
     public function publish($msgBody, $routingKey = null)
     {
         $this->setupFabric();
@@ -39,7 +31,7 @@ class Producer extends BaseAmqp
         $this->getChannel()->basic_publish(
             new AMQPMessage($msgBody, array('content_type' => $this->contentType, 'delivery_mode' => $this->deliveryMode)),
             !empty($this->exchangeOptions['name']) ? $this->exchangeOptions['name'] : '',
-            !is_null($routingKey) ? $routingKey : $this->defaultRoutingKey
+            !is_null($routingKey) ? $routingKey : (isset($this->queueOptions['name']) ? $this->queueOptions['name'] : '')
         );
     }
 }

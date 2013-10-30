@@ -15,13 +15,15 @@ abstract class BaseAmqp
     protected $routingKey = '';
 
     protected $exchangeOptions = array(
+        'name' => '',
         'passive' => false,
         'durable' => true,
         'auto_delete' => false,
         'internal' => false,
         'nowait' => false,
         'arguments' => null,
-        'ticket' => null
+        'ticket' => null,
+        'declare' => true,
     );
 
     protected $queueOptions = array(
@@ -32,7 +34,8 @@ abstract class BaseAmqp
         'auto_delete' => false,
         'nowait' => false,
         'arguments' => null,
-        'ticket' => null
+        'ticket' => null,
+        'declare' => true,
     );
 
     /**
@@ -88,20 +91,11 @@ abstract class BaseAmqp
     }
 
     /**
-     * @throws \InvalidArgumentException
      * @param  array                     $options
      * @return void
      */
     public function setExchangeOptions(array $options = array())
     {
-        if (empty($options['name'])) {
-            throw new \InvalidArgumentException('You must provide an exchange name');
-        }
-
-        if (empty($options['type'])) {
-            throw new \InvalidArgumentException('You must provide an exchange type');
-        }
-
         $this->exchangeOptions = array_merge($this->exchangeOptions, $options);
     }
 
@@ -125,7 +119,11 @@ abstract class BaseAmqp
 
     protected function exchangeDeclare()
     {
-        if (!empty($this->exchangeOptions['name'])) {
+        if ($this->exchangeOptions['declare'] && !empty($this->exchangeOptions['name'])) {
+            if (empty($this->exchangeOptions['type'])) {
+                throw new \InvalidArgumentException('You must provide an exchange type');
+            }
+
             $this->getChannel()->exchange_declare(
                 $this->exchangeOptions['name'],
                 $this->exchangeOptions['type'],
@@ -143,7 +141,7 @@ abstract class BaseAmqp
 
     protected function queueDeclare()
     {
-        if (null !== $this->queueOptions['name']) {
+        if ($this->queueOptions['declare']) {
             list($queueName, ,) = $this->getChannel()->queue_declare($this->queueOptions['name'], $this->queueOptions['passive'],
                 $this->queueOptions['durable'], $this->queueOptions['exclusive'],
                 $this->queueOptions['auto_delete'], $this->queueOptions['nowait'],

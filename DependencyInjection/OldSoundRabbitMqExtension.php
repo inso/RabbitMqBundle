@@ -91,19 +91,12 @@ class OldSoundRabbitMqExtension extends Extension
                 $definition->addTag('old_sound_rabbit_mq.base_amqp');
                 $definition->addTag('old_sound_rabbit_mq.producer');
 
-                //this producer doesn't define a exchange
                 if (isset($producer['exchange_options'])) {
                     $definition->addMethodCall('setExchangeOptions', array($producer['exchange_options']));
                 }
 
-                //this producer doesn't define a queue
-                if (!isset($producer['queue_options'])) {
-                    $producer['queue_options']['name'] = null;
-                }
-                $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
-
-                if (isset($producer['default_routing_key'])) {
-                    $definition->addMethodCall('setDefaultRoutingKey', array($producer['default_routing_key']));
+                if (isset($producer['queue_options'])) {
+                    $definition->addMethodCall('setQueueOptions', array($producer['queue_options']));
                 }
 
                 $this->injectConnection($definition, $producer['connection']);
@@ -128,9 +121,16 @@ class OldSoundRabbitMqExtension extends Extension
             $definition
                 ->addTag('old_sound_rabbit_mq.base_amqp')
                 ->addTag('old_sound_rabbit_mq.consumer')
-                ->addMethodCall('setExchangeOptions', array($consumer['exchange_options']))
-                ->addMethodCall('setQueueOptions', array($consumer['queue_options']))
-                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')));
+                ->addMethodCall('setCallback', array(array(new Reference($consumer['callback']), 'execute')))
+            ;
+
+            if (isset($consumer['exchange_options'])) {
+                $definition->addMethodCall('setExchangeOptions', array($consumer['exchange_options']));
+            }
+
+            if (isset($consumer['queue_options'])) {
+                $definition->addMethodCall('setQueueOptions', array($consumer['queue_options']));
+            }
 
             if (array_key_exists('qos_options', $consumer)) {
                 $definition->addMethodCall('setQosOptions', array(

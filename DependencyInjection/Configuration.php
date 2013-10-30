@@ -45,7 +45,6 @@ class Configuration implements ConfigurationInterface
                         ->append($this->getQueueConfiguration())
                         ->children()
                             ->scalarNode('connection')->defaultValue('default')->end()
-                            ->scalarNode('default_routing_key')->end()
                         ->end()
                     ->end()
                 ->end()
@@ -122,6 +121,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('nowait')->defaultValue(false)->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
+                ->booleanNode('declare')->defaultTrue()->end()
             ->end()
         ;
     }
@@ -144,6 +144,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->end()
                     ->defaultValue(array())
                 ->end()
+                ->booleanNode('declare')->defaultTrue()->end()
             ->end()
         ;
     }
